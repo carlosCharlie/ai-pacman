@@ -1,4 +1,6 @@
 
+//This script was developed by carlosCharlie (https://github.com/carlosCharlie)
+
 let path = [];
 
 class Ia{

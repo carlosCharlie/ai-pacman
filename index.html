@@ -2,42 +2,79 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>HTML5 Pacman</title>
-    
-    <style type="text/css">
-      @font-face {
-	    font-family: 'BDCartoonShoutRegular';
-        src: url('BD_Cartoon_Shout-webfont.ttf') format('truetype');
-	    font-weight: normal;
-	    font-style: normal;
-      }
-      #pacman {
-        height:450px;
-        width:342px;
-        margin:20px auto;
-      }
-      #shim { 
-        font-family: BDCartoonShoutRegular; 
-        position:absolute;
-        visibility:hidden
-      }
-      h1 { font-family: BDCartoonShoutRegular; text-align:center; }
-      body { width:342px; margin:0px auto; font-family:sans-serif; }
-      a { text-decoration:none; }
-    </style>
-
+    <title>HTML5 Pacman - AI</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
   
+  <div id="intro">
+    <h1>Introduction</h1>
+    <p>
+      <h3>What is this?</h3>
+      <p>
+          This is a modification of <a href="https://github.com/daleharvey/pacman">the pac-man game developed by daleharvey</a> to which I have added an artificial intelligence that learns to play by looking at the user's movements, using a <a href="https://github.com/mljs/decision-tree-cart">ml.js library decision tree</a>.
+          The more you play, the better the ai plays.
+      </p>
+      <h3>How to try it?</h3>
+      <ol>
+        <li>
+          Click on "Play" button.
+        </li>
+        <li>
+          Play the game with your keyboard arrows keys. (For a good result, try to cover all the map running from ghosts).
+        </li>
+        <li>
+          Click "Start AI".
+        </li>
+      </ol>
+      <p>
+      You can play again and the ai will keep learning.
+      <br>
+      <u>Reloading the page will empty the saved data!</u>
+      <br>
+      Remember that the ai uses only the data of the current game, so it will surely be very dumb.
+    </p>
+    </p>
+    <button id="okIntro">OK</button>
+  </div>
   <div id="shim">shim for font face</div>
 
-  <h1>HTML5 Pacman</h1>
+  <div id="main">
+    <div>
+      <h1>HTML5 Pacman</h1>
+      <div id="pacman">
+    </div>
+  </div>
+  <div id="sep"></div>
+    <div>
+      <h1>Artificial inteligence</h1>
+      <div id="ai">
 
-  <a href="http://arandomurl.com/">Writeup</a> |
-  Code on <a href="http://arandomurl.com/">Github</a>
+        <div id="list">
+          <table id="tableList">
+              <tr>
+                  <th colspan="13">Input</th>
+              </tr>
+          </table>
+        </div>
+        <div id="keys">
+          <div></div><div id="up" class="key">UP</div><div></div>
+          <div id="left" class="key">LEFT</div>
+          <div></div>
+          <div id="right" class="key">RIGHT</div>
+          <div></div><div id="down" class="key">DOWN</div><div></div>
+        </div>
+      </div>
+      <div id="buttons">
+          <button id="play">Play</button>
+          <button id="startIA">Start AI</button>
+        </div>
+    </div>
+  </div>
 
-  <div id="pacman"></div>
+  <script src="ia/ml.js"></script>
+  <script src="ia/ia.js"></script>
   <script src="pacman.js"></script>
   <script src="modernizr-1.5.min.js"></script>
 
@@ -45,14 +82,30 @@
 
     var el = document.getElementById("pacman");
 
-    if (Modernizr.canvas && Modernizr.localstorage && 
+    if (typeof(Worker) !== "undefined" && Modernizr.canvas && Modernizr.localstorage && 
         Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
       window.setTimeout(function () { PACMAN.init(el, "./"); }, 0);
     } else { 
       el.innerHTML = "Sorry, needs a decent browser<br /><small>" + 
         "(firefox 3.6+, Chrome 4+, Opera 10+ and Safari 4+)</small>";
     }
+
+    document.getElementById("play").onclick = ()=>{
+      userPlay();
+      el.onclick();
+    };
+    document.getElementById("startIA").onclick = ()=>{
+      iaPlay();
+      el.onclick();
+    }
+    document.getElementById("okIntro").onclick = ()=>{
+      document.getElementById("intro").style.display="none";
+      el.onclick();
+    };
+
   </script>
+
+  </div>
 
 </body>
 </html>

@@ -7,6 +7,12 @@
  * fix what happens when a ghost is eaten (should go back to base)
  * do proper ghost mechanics (blinky/wimpy etc)
  */
+var keyDown;
+var iaWorking = false;
+var ia = null;
+var key;
+
+var ghostPos = [];
 
 var NONE        = 4,
     UP          = 3,
@@ -21,7 +27,15 @@ var NONE        = 4,
     DYING       = 10,
     Pacman      = {};
 
-Pacman.FPS = 30;
+Pacman.FPS = 20;
+
+function iaPlay(){
+    iaWorking = true;
+}
+
+function userPlay(){
+    iaWorking = false;
+}
 
 Pacman.Ghost = function (game, map, colour) {
 
@@ -94,8 +108,8 @@ Pacman.Ghost = function (game, map, colour) {
     };
 
     function makeEatable() {
-        direction = oppositeDirection(direction);
-        eatable = game.getTick();
+        //direction = oppositeDirection(direction);
+        //eatable = game.getTick();
     };
 
     function eat() { 
@@ -259,6 +273,7 @@ Pacman.Ghost = function (game, map, colour) {
         
         due = getRandomDirection();
         
+
         return {
             "new" : position,
             "old" : oldPos
@@ -335,8 +350,10 @@ Pacman.User = function (game, map) {
     function keyDown(e) {
         if (typeof keyMap[e.keyCode] !== "undefined") { 
             due = keyMap[e.keyCode];
-            e.preventDefault();
-            e.stopPropagation();
+            if(e.preventDefault != undefined && e.preventDefault != null){
+                e.preventDefault();
+                e.stopPropagation();
+            }
             return false;
         }
         return true;
@@ -400,6 +417,15 @@ Pacman.User = function (game, map) {
                 (onGridSquare(position) && 
                  map.isFloorSpace(next(npos, due)))) {
                 direction = due;
+               
+                if(!iaWorking && position!=undefined)
+                ia.learn(ghostPos,position,key,
+                    [map.isWallSpace({"y":position.y/10+1,"x":(position.x)/10}),
+                    map.isWallSpace({"y":position.y/10-1,"x":(position.x)/10}),
+                    map.isWallSpace({"y":position.y/10,"x":(position.x)/10+1}),
+                    map.isWallSpace({"y":position.y/10,"x":(position.x)/10-1})]
+                    );
+                
             } else {
                 npos = null;
             }
@@ -542,6 +568,9 @@ Pacman.Map = function (size) {
     }
     
     function isWall(pos) {
+        pos.y = Math.round(pos.y);
+        pos.x = Math.round(pos.x);
+
         return withinBounds(pos.y, pos.x) && map[pos.y][pos.x] === Pacman.WALL;
     }
     
@@ -779,7 +808,7 @@ var PACMAN = (function () {
         eatenCount   = 0,
         level        = 0,
         tick         = 0,
-        ghostPos, userPos, 
+        userPos, 
         stateChanged = true,
         timerStart   = null,
         lastTime     = 0,
@@ -848,7 +877,29 @@ var PACMAN = (function () {
             audio.pause();
             map.draw(ctx);
             dialog("Paused");
-        } else if (state !== PAUSE) {   
+        } else if (state !== PAUSE) {
+
+            
+            key = e.keyCode;
+
+            for(let i of document.getElementsByClassName("key"))
+                i.style.borderColor = "transparent";
+
+            switch(e.keyCode){
+                case KEY.ARROW_UP:
+                    document.getElementById("up").style.borderColor="white";
+                    break;
+                case KEY.ARROW_DOWN:
+                    document.getElementById("down").style.borderColor="white";
+                    break;
+                case KEY.ARROW_LEFT:
+                    document.getElementById("left").style.borderColor="white";
+                    break;
+                case KEY.ARROW_RIGHT:
+                    document.getElementById("right").style.borderColor="white";
+                    break;
+            }
+
             return user.keyDown(e);
         }
         return true;
@@ -921,6 +972,9 @@ var PACMAN = (function () {
         }
         u = user.move(ctx);
         
+        if(ia==null)
+            ia = new Ia();
+        
         for (i = 0, len = ghosts.length; i < len; i += 1) {
             redrawBlock(ghostPos[i].old);
         }
@@ -964,7 +1018,15 @@ var PACMAN = (function () {
         map.drawPills(ctx);
 
         if (state === PLAYING) {
-            mainDraw();
+            
+              if(iaWorking && userPos!=undefined && ghostPos!=undefined && ghostPos!=null && ghostPos.length>0)
+                keyDown({keyCode:ia.move(ghostPos,userPos,
+                                        [map.isWallSpace({"y":userPos.y/10+1,"x":(userPos.x)/10}),
+                                        map.isWallSpace({"y":userPos.y/10-1,"x":(userPos.x)/10}),
+                                        map.isWallSpace({"y":userPos.y/10,"x":(userPos.x)/10+1}),
+                                        map.isWallSpace({"y":userPos.y/10,"x":(userPos.x)/10-1})])});
+        
+                mainDraw();
         } else if (state === WAITING && stateChanged) {            
             stateChanged = false;
             map.draw(ctx);
@@ -999,7 +1061,6 @@ var PACMAN = (function () {
                 }
             }
         } 
-
         drawFooter();
     }
 
@@ -1253,9 +1314,12 @@ Pacman.WALLS = [
      {"line": [10.5, 9.5]}]
 ];
 
-Object.prototype.clone = function () {
+Pacman.MAP.clone = function () {
     var i, newObj = (this instanceof Array) ? [] : {};
     for (i in this) {
+        
+        this[i].clone = Pacman.MAP.clone;
+
         if (i === 'clone') {
             continue;
         }

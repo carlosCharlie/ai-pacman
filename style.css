@@ -1,0 +1,130 @@
+@font-face{
+    font-family: 'BDCartoonShoutRegular';
+    src: url('BD_Cartoon_Shout-webfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+#pacman{
+    height:450px;
+    width:342px;
+}
+#shim{ 
+    font-family: BDCartoonShoutRegular; 
+    position:absolute;
+    visibility:hidden
+}
+h1{
+    font-family: BDCartoonShoutRegular;
+    text-align:center;
+}
+body{
+    width:342px; margin:0px auto;
+    font-family:sans-serif;
+    color:white;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+}
+
+a{
+    text-decoration:none;
+    color:blue;
+}
+
+#ai{
+    width: 40vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#main{
+    display: flex;
+    justify-content: space-around;
+}
+
+#sep{
+    width: 5px;
+    border-left:2px solid white;
+    border-right: 2px solid white;
+    height:450px;
+    margin: 20%;
+}
+
+#keys{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto auto auto;
+    text-align: center;
+}
+
+.key{
+    margin: 5px;
+    border: 2px transparent solid;
+    padding: 5px;
+    border-radius: 7px;
+}
+
+table,th,tr{
+    border: white 1px solid;
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+}
+
+#list{
+    height: 40vh;
+    width: 100%;
+    overflow: scroll;
+}
+
+#buttons{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 5%;
+}
+
+button{
+width: 50%;
+
+font-size: 40px;
+
+background: blue;
+
+border-radius: 5px;
+
+border-color: blue;
+
+margin:2%;
+}
+
+button:hover{
+    background-color: #004bff;
+}
+
+#intro{
+    background-color: rgba(0, 0, 0, 0.93);
+    border: 2px white solid;
+    border-radius: 5%;
+    position: fixed;
+    margin: auto;
+    padding: 2vw;
+    text-align: center;
+    width: 45vw;
+    align-self: center;
+    top: 5vh;
+    height: 80vh;
+    overflow: scroll;
+
+}
+
+ol{
+    text-align: left;
+}
+
+p{
+    text-align: justify;
+}
